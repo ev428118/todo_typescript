@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import './App.css';
+import { v4 as uuidv4 } from 'uuid';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 
 function App() {
   const [inputValue, setInputValue] = useState("");
@@ -7,31 +10,39 @@ function App() {
 
   type Todo = {
     inputValue: string;
-    id: number;
+    id: string;
     checked: boolean;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  // console.log(e.target.value);
-    setInputValue(e.target.value);
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // // console.log(e.target.value);
+  //   setInputValue(e.target.value);
+  // };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
   };
+  
+  
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-
-  // 新しいTodoを作成
-  const newTodo: Todo = {
-    inputValue: inputValue,
-    id: todos.length,
-    checked: false,
+    // 新しいTodoを作成
+    const newTodo: Todo = {
+      inputValue: inputValue,
+      id: uuidv4(),
+      checked: false,
+    };
+    if (inputValue.length >= 1) {
+    setTodos([newTodo, ...todos]);
+    setInputValue("");
+    }
   };
-
-  setTodos([newTodo, ...todos]);
-  setInputValue("");
-};
+  
 
   // チェックボックス
-const handleEdit = (id: number, inputValue: string) => {
+const handleEdit = (id: string, inputValue: string) => {
   const newTodos = todos.map((todo) => {
     if (todo.id === id) {
       todo.inputValue = inputValue;
@@ -42,7 +53,7 @@ const handleEdit = (id: number, inputValue: string) => {
   setTodos(newTodos);
 };
 
-const handleChecked = (id: number ,checked: boolean) => {
+const handleChecked = (id: string ,checked: boolean) => {
   const newTodos = todos.map((todo) => {
     if (todo.id === id) {
       todo.checked = !checked;
@@ -53,7 +64,7 @@ const handleChecked = (id: number ,checked: boolean) => {
   setTodos(newTodos);
 };
 
-const handleDelete = (id: number) => {
+const handleDelete = (id: string) => {
   const newTodos = todos.filter((todo) => todo.id !== id);
   setTodos(newTodos);
 };
@@ -62,12 +73,20 @@ const handleDelete = (id: number) => {
     <div className="App">
       <div>
         <h2>Todoリスト with Typescript</h2>
-        <form onSubmit={(e) => handleSubmit(e)}>
-          <input
+        <form onSubmit={handleSubmit}>
+        <TextField id="required" label="TODOを入力" variant="outlined"
+          size="small"
+          value={inputValue}
+          onChange={(e) => {handleChange(e)}}
+          >
+          </TextField>
+          {/* <input
+            value={inputValue}
             type = "text"
             onChange={(e) => handleChange(e)}
-            className="inputText" />
-          <input type = "submit" value="作成"　className='submitButton' />
+            /> */}
+          <Button variant="contained" 
+          onClick={(e) => {handleSubmit(e)}}>作成</Button>
         </form>
         <ul className='todoList'
         >
